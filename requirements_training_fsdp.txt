@@ -1,0 +1,7 @@
+wandb
+accelerate
+bitsandbytes
+transformers
+peft
+tenacity
+tiktoken

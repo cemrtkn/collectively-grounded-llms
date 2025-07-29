@@ -1,0 +1,7 @@
+numpy
+PyYAML
+pydantic
+pytest
+tqdm
+datasets
+httpx

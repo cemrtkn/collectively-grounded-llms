@@ -1,0 +1,62 @@
+model: meta-llama/Meta-Llama-3-8B-Instruct
+ptmp_dir: /ptmp/certuer
+train_args:
+  output_dir: projects/collectively_grounded_llms/experiments/train/sft_instruct_fsdp/2025_07_28__15_42_41/test_fold_None/models
+  seed: 4242
+  learning_rate: 5.0e-06
+  warmup_ratio: 0.05
+  weight_decay: 0.01
+  num_train_epochs: 1
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 1
+  gradient_checkpointing: true
+  gradient_checkpointing_kwargs:
+    use_reentrant: false
+  bf16: true
+  save_strategy: epoch
+  eval_strategy: steps
+  logging_steps: 1
+  eval_steps: 0.1
+  log_on_each_node: false
+  logging_first_step: true
+  eval_on_start: true
+  report_to: []
+  optim: paged_adamw_32bit
+  lr_scheduler_type: linear
+  run_name: Llama-3-8B-Instruct-lr-5e-6-Full | 2025_07_28__15_42_41 | None
+  max_steps: -1
+train_dataset_config:
+  data_path: projects/collectively_grounded_llms/data/processed/toy_dataset
+  parser_config:
+    fields:
+      system_prompt:
+        text: '<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+          You are conversation generator. You will be given a player and an NPC with
+          their personas. Your task is to generate a conversation between the player
+          and the NPC.<|eot_id|>
+
+          <|start_header_id|>user<|end_header_id|>'
+      user_prompt:
+        text: '
+
+          Here is the information about the NPC and the player:
+
+          NPC: {npc_name}
+
+          Persona: {npc_persona}
+
+
+          Player: {player_name}
+
+          Persona: {player_persona}
+
+
+          Can you create a conversation?
+
+          <|start_header_id|>assistant<|end_header_id|>'
+      conversation:
+        text: '
+
+          {conversation}<|eot_id|>'

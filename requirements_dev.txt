@@ -1,0 +1,10 @@
+ipdb
+ipython
+autopep8
+ipykernel
+jupyter
+notebook
+papermill
+black
+flake8
+awscli

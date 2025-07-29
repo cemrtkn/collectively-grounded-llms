@@ -1,0 +1,28 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "npc_name": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "npc_persona": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "player_name": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "player_persona": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "conversation": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": ""
+}
