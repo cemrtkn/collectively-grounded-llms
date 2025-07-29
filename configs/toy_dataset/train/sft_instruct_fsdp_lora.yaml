@@ -52,7 +52,7 @@ peft_config: # Check the PEFT documentation for more details
 #   filter: {}
 train_dataset_config:
   test_fold: <<test_fold>> # The fold to use for testing (default is 0)
-  data_path: <<dataset>>  # Path to the dataset. Tip: Use "dev_replay_instruct" for debugging and fast training.
+  data_path: data/toy_dataset/processed
   parser_config:
     fields:
       system_prompt:

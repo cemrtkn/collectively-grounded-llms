@@ -39,6 +39,6 @@ projects/*/data/*/local/
 cache-*.arrow
 
 *.code-workspace
-**/*venv*/**
-.*venv*/**
+*venv*/
+experiments/*
 
