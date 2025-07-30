@@ -53,7 +53,7 @@ python run_slurm.py \
   --per_device_eval_batch_size 4 \
   --n_folds 1 \
   --template scripts/raven/run_slurm_template_accelerate.slurm \
-  --hf_home /ptmp/certuer/huggingface \
+  --hf_home /ptmp/$USER/huggingface \
   --ptmp_dir /ptmp/$USER \
   --name Lama-3-8B-Instruct-lr-1e-4-LoRA \
   --lr 1e-4
@@ -80,7 +80,7 @@ python run_slurm.py \
   --per_device_eval_batch_size 4 \
   --n_folds 1 \
   --template scripts/raven/run_slurm_template_accelerate.slurm \
-  --hf_home /ptmp/certuer/huggingface \
+  --hf_home /ptmp/$USER/huggingface \
   --ptmp_dir /ptmp/$USER \
   --name Lama-3-8B-Instruct-lr-1e-4-LoRA \
   --lr 1e-4
