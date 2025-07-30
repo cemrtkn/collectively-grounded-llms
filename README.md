@@ -18,34 +18,23 @@ By anchoring AI in real communities, we treat it not just as a neutral tool, but
 1. load python version `module load python-waterboa/2024.06`
 2. Build a venv with a descriptive name (there are different requirement packages) `python -m venv <<descriptive_venv_name>>`
 3. Find virtual environment: `source <<descriptive_venv_name>>/bin/activate`
-5. Activate virtual environment: `source <<activate_file>>`
-6. Install sft "src" directory as a package that can be imported from outside `python setup.py install`
-7. Check different requirement packages at setup.py
+4. Install from one of the requirement packages (example for fsdp training) `pip install -e .[training_fsdp]`
+5. Check different requirement packages at setup.py
 
 ## Run Project
 
-The documentation on how to use this project is to be found in [doc](doc/) folder. Available guides are
+The documentation on how to use this project is to be found in [docs](docs/) folder. Available guides are
 
-- ([How to run an example sft](docs/fine_tuning.md))
-- ([run_slurm.py explanation](docs/run_slurm.md))
-- ([Interactive dev session on Raven](docs/get_ipython_shell_on_raven.md))
+- [How to run an example sft](docs/fine_tuning.md)
+- [run_slurm.py explanation](docs/run_slurm.md)
+- [Interactive dev session on Raven](docs/get_ipython_shell_on_raven.md)
 
 
 ## Running Tests (not active atm)
 
-Execute tests using pytest:
-```bash
-poetry run pytest
-```
-or if you want to get coverage report
-```bash
-poetry run coverage run --source=src -m pytest
-&& poetry run coverage report
-```
 
 ## Continuous Integration (not active atm)
 
-The CI  system automatically runs code quality checks and tests on every push and pull request. It verifies code formatting, runs pre-commit hooks, executes the test suite, and ensures test coverage meets the 90% minimum requirement.
 
 ## Contributing
 

@@ -41,4 +41,5 @@ cache-*.arrow
 *.code-workspace
 *venv*/
 experiments/*
+!experiments/.gitkeep
 
