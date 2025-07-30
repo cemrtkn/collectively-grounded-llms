@@ -1,12 +1,8 @@
-from typing import Dict, List, Optional, Tuple, Any
-
-import pandas as pd
+from typing import Dict, List, Optional, Any
 import yaml
-from datasets import Dataset, DatasetDict
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Field, root_validator
 
 from src.base_types import Event, Conversation
-from src.utils.parse_arguments import get_config_from_args
 
 
 class EventConfig(BaseModel):
@@ -256,5 +252,5 @@ class ToyParser():
         return text_results
 
 class ParseEventConfig(BaseModel):
-    events_dataset: str = Field(default="data/events/dev", description="Path to the events dataset")
-    config: str = Field(default="config/dev.yml", description="Path to the config file")
+    events_dataset: str = Field(default="data/dev", description="Path to the events dataset")
+    config: str = Field(default="config/dev/dev.yml", description="Path to the config file")

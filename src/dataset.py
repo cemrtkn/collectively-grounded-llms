@@ -166,7 +166,6 @@ class EventDataset(Dataset):
         return result
     
 
-    # from src.sft_types import TrainingConfig
 class ToyDataset(Dataset):
     @classmethod
     def from_convs(
@@ -327,7 +326,7 @@ class ToyDatasetDict(CrossvalDatasetDict):
 
 if __name__ == "__main__":
     # Example usage
-    with open("/u/certuer/llm-strategic-tuning/projects/collectively_grounded_llms/configs/train/sft_instruct_fsdp_lora.yaml", "r") as f:
+    with open("/u/certuer/collectively-grounded-llms/configs/toy_dataset/train/sft_instruct_fsdp_lora.yaml", "r") as f:
         config = yaml.safe_load(f)
     print("Loaded config:", config)
     #config = TrainingConfig(**config)
@@ -344,7 +343,7 @@ if __name__ == "__main__":
     
     dataset_config = config["train_dataset_config"]
 
-    
+    dataset_config = ToyDatasetConfig(**dataset_config)
     dataset_dict = ToyDatasetDict(
         config=dataset_config,
         tokenizer=tokenizer,

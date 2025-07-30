@@ -54,7 +54,7 @@ MASTER_PORT=6000
 
 # OTHER LAUNCHERS CAN BE USED HERE
 export LAUNCHER="accelerate launch \
-    --config_file projects/coopbot/configs/sft/fsdp_config.yaml \
+    --config_file configs/fsdp_config.yaml \
     --main_process_ip $MASTER_ADDR \
     --main_process_port $MASTER_PORT \
     --machine_rank \$SLURM_PROCID \

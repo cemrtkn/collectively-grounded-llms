@@ -8,7 +8,6 @@ from typing import List, Optional
 from src.parser import ParserConfig
 from transformers import TrainerCallback
 from torch.nn.utils.rnn import pad_sequence
-from torch.nn.functional import log_softmax
 from transformers.trainer_pt_utils import LabelSmoother
 
 IGNORE_INDEX = LabelSmoother.ignore_index

@@ -2,66 +2,15 @@ from itertools import islice
 
 import bitsandbytes as bnb
 import torch
-from peft.auto import AutoPeftModelForCausalLM
-from peft.config import PeftConfig
 from peft.mapping import get_peft_model
 from peft.tuners.lora import LoraConfig
 from peft.utils.other import prepare_model_for_kbit_training
 from transformers import (
     AutoModelForCausalLM,
-    AutoTokenizer,
     BitsAndBytesConfig,
-    PreTrainedModel,
-    PreTrainedTokenizer,
-)
-from transformers.models.auto.auto_factory import (
-    _BaseAutoModelClass,
 )
 
 from src.sft_types import TrainingConfig
-from src.simulation_types import LLMPlayerConfig
-from typing import Optional
-import os
-import json
-
-simulation_model_cache = {}
-
-
-def get_simulation_model(
-    config: LLMPlayerConfig,
-) -> tuple[PreTrainedModel, PreTrainedTokenizer, str]:
-    if config.model_name not in simulation_model_cache:
-        AutoModelClass = AutoPeftModelForCausalLM if config.uses_peft else AutoModelForCausalLM
-        assert not (config.load_in_8bit and config.use_flash_attention)
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            if config.use_flash_attention:
-                model = AutoModelClass.from_pretrained(
-                    config.model_name,
-                    torch_dtype="auto",
-                    attn_implementation="flash_attention_2",
-                    device_map="auto",
-                    low_cpu_mem_usage=True,
-                )
-            else:
-                model = AutoModelClass.from_pretrained(
-                    config.model_name,
-                    device_map="auto",
-                    load_in_8bit=config.load_in_8bit,
-                    torch_dtype="auto",
-                    low_cpu_mem_usage=True,
-                )
-        else:
-            model = AutoModelClass.from_pretrained(config.model_name)
-        if config.uses_peft:
-            peft_config = PeftConfig.from_pretrained(config.model_name)
-            base_model_name = peft_config.base_model_name_or_path
-        else:
-            base_model_name = config.model_name
-        tokenizer = AutoTokenizer.from_pretrained(base_model_name)
-        simulation_model_cache[config.model_name] = (model, tokenizer, base_model_name)
-    return simulation_model_cache[config.model_name]
-
 
 def get_model(config: TrainingConfig):
     if config.peft_config is not None:

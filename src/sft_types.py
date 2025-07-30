@@ -2,7 +2,7 @@ from typing import Any, Optional, List
 
 from pydantic import BaseModel, Field, PydanticUndefinedAnnotation
 
-from src.dataset import EventDatasetConfig, ToyDatasetConfig
+from src.dataset import ToyDatasetConfig
 from src.training_mode import FreezeLayerConfig, PeftConfig, QuantizationConfig
 from src.utils.custom_eval_callback import LoggingGroup
 

@@ -1,7 +1,7 @@
 from transformers import PreTrainedTokenizer
 from transformers.trainer_pt_utils import LabelSmoother
 
-from src.dataset import DataCollatorWithPadding, EventDatasetDict, ToyDatasetDict
+from src.dataset import DataCollatorWithPadding, ToyDatasetDict
 from src.sft_types import TrainingConfig
 
 IGNORE_INDEX = LabelSmoother.ignore_index

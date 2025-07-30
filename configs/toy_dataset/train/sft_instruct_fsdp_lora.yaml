@@ -1,4 +1,4 @@
-model: <<model_name>> # Path to the the Huggingface model
+model: meta-llama/Meta-Llama-3-8B-Instruct # Path to the the Huggingface model
 ptmp_dir: <<ptmp_dir>> # Set to /ptmp/$USER to save the fine-tuned model in the ptmp directory (ptmp_dir + /output_dir). If None, the model will be saved in the output_dir.
 train_args: # Check the Huggingface Trainer documentation for more details
   output_dir: <<output_dir>>/models
@@ -34,24 +34,8 @@ peft_config: # Check the PEFT documentation for more details
   lora_dropout: 0.0
   r: 64
   bias: none
-#logging_group_for_custom_eval: # Custom evaluation logging groups to log and aggregate the logp values for each group name.
-# - name: first_round
-#   filter:
-#    rounds: [0]
-# - name: end_game_messages  # Name of the logging group in Wandb
-#   filter:
-#    types: ["message"] # Filter by event type "message"
-#    rounds: [25,26,27,28,29] # Filter by specific rounds
-# - name: messages
-#   filter: 
-#    types: ["message"]
-# - name: actions
-#   filter: 
-#    types: ["action"]
-# - name: all
-#   filter: {}
 train_dataset_config:
-  test_fold: <<test_fold>> # The fold to use for testing (default is 0)
+  test_fold: 0 # The fold to use for testing (default is 0)
   data_path: data/toy_dataset/processed
   parser_config:
     fields:
