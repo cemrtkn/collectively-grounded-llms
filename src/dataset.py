@@ -9,11 +9,14 @@ from tqdm import tqdm
 from transformers import PreTrainedTokenizerBase
 from transformers.trainer_pt_utils import LabelSmoother
 
-from src.base_types import Event, Conversation
-from src.parser import EventParser, ParserConfig, ToyParser, ToyParserConfig
 import yaml
 from transformers import AutoTokenizer
 import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from data.toy_dataset.toy_base_types import Conversation
+from data.toy_dataset.toy_parser import ToyParser, ToyParserConfig
 
 IGNORE_INDEX = LabelSmoother.ignore_index
 
@@ -108,62 +111,12 @@ def texts_to_training_tensors_instruct(
     result["labels"] = labels_list
     return result
 
-
-def ds_unravel(ds_dict: dict, allow_none=False):
-    """Takes a dict like
-    {'event.values.gpt2':'1','event.values.replay':'2','event.game_idx':1,'game.contribution':1.6}
-    and turns it into
-    {'event':{'values':{'gpt2':'1','replay':'2'},'game_idx':1},'game':{'contribution':1.6}}"""
-    form_dic = dict()
-    for key, value in ds_dict.items():
-        if allow_none or value is not None:
-            parts = key.split(".")
-            cur_dic = form_dic
-            if len(parts) > 1:
-                for p in parts[:-1]:
-                    if p not in cur_dic:
-                        cur_dic[p] = {}
-                    cur_dic = cur_dic[p]
-            cur_dic[parts[-1]] = value
-    return form_dic
-
-
-class EventDatasetConfig(BaseModel):
-    mask_untrainable_tokens: bool = True
-    parser_config: ParserConfig
-    data_path: str
-    test_fold: Optional[int] = 0
-
-class ToyDatasetConfig(BaseModel):
+class DatasetConfig(BaseModel):
     mask_untrainable_tokens: bool = True
     data_path: str
     parser_config: ToyParserConfig
     test_fold: Optional[int] = 0
 
-
-class EventDataset(Dataset):
-    @classmethod
-    def from_events(
-        cls,
-        events: List[Event],
-        tokenizer: PreTrainedTokenizerBase,
-        event_parser: EventParser,
-        mask_untrainable_tokens: bool,
-        max_rounds: Optional[int] = 30,
-        n_players: Optional[int] = 2,
-    ):
-        texts = (
-            event_parser.sft_parse_per_rounds(events, max_rounds=max_rounds, n_players=n_players)
-        )
-        data = (
-            texts_to_training_tensors_instruct(texts, tokenizer, mask_untrainable_tokens)
-        )
-
-        result = cls.from_dict(data)
-        result.set_format(type="torch", columns=["input_ids", "labels"])
-        print(result["input_ids"][0])
-        print(result["labels"][0])
-        return result
     
 
 class ToyDataset(Dataset):
@@ -234,63 +187,14 @@ class CrossvalDatasetDict(DatasetDict):
         return DatasetDict(result_dic)
 
 
-class EventDatasetDict(CrossvalDatasetDict):
+class CustomDatasetDict(CrossvalDatasetDict):
     def __init__(
-        self, config: EventDatasetConfig, tokenizer: PreTrainedTokenizerBase, test_fold: int = 0
+        self, config: DatasetConfig, tokenizer: PreTrainedTokenizerBase, test_fold: int = 0
     ):
         """Loads the dataset from the config and splits it into train and test.
 
         Args:
-            config (EventDatasetConfig): The config to load the datasets from.
-            tokenizer (PreTrainedTokenizerBase): The tokenizer to use.
-            test_fold (int, optional): The fold to use as test. Defaults to 0.
-        """
-        super().__init__()
-
-        # Instance attributes
-        self.config = config
-        self.test_fold = test_fold
-
-        self._load_datasets(tokenizer)
-
-    def _load_datasets(self, tokenizer: PreTrainedTokenizerBase):
-        # Load datasets using the paths from the config
-        raw_datasets: DatasetDict = self.load_from_disk(self.config.data_path, self.test_fold)
-
-        event_parser = EventParser(self.config.parser_config)
-
-        for ds_name, ds in raw_datasets.items():
-            if "event_idx" in ds.features:
-                # Keep this for backwards compatibility
-                events = [Event(**data) for data in ds]
-            else:
-                # New format
-                events = [
-                    Event(**{k[6:]: v for k, v in data.items() if k[0:6] == "event."})
-                    for data in ds
-                ]
-
-            max_rounds = ds.unique("game.n_rounds")[0]
-            n_players = ds.unique("game.n_players")[0]
-                                
-            self[ds_name] = EventDataset.from_events(
-                events,
-                tokenizer,
-                event_parser,
-                self.config.mask_untrainable_tokens,
-                max_rounds,
-                n_players,
-            )
-
-
-class ToyDatasetDict(CrossvalDatasetDict):
-    def __init__(
-        self, config: ToyDatasetConfig, tokenizer: PreTrainedTokenizerBase, test_fold: int = 0
-    ):
-        """Loads the dataset from the config and splits it into train and test.
-
-        Args:
-            config (ToyDatasetConfig): The config to load the datasets from.
+            config (DatasetConfig): The config to load the datasets from.
             tokenizer (PreTrainedTokenizerBase): The tokenizer to use.
             test_fold (int, optional): The fold to use as test. Defaults to 0.
         """
@@ -320,7 +224,7 @@ class ToyDatasetDict(CrossvalDatasetDict):
                 parser,
                 self.config.mask_untrainable_tokens
             )
-        print(f"Loaded {len(convs)} conversations from {ds_name} dataset.") 
+        print(f"Loaded {len(convs)} data points from {ds_name} dataset.") 
 
 
 
@@ -328,8 +232,6 @@ if __name__ == "__main__":
     # Example usage
     with open("/u/certuer/collectively-grounded-llms/configs/toy_dataset/train/sft_instruct_fsdp_lora.yaml", "r") as f:
         config = yaml.safe_load(f)
-    print("Loaded config:", config)
-    #config = TrainingConfig(**config)
 
     tokenizer = AutoTokenizer.from_pretrained(
         config["model"],
@@ -343,8 +245,8 @@ if __name__ == "__main__":
     
     dataset_config = config["train_dataset_config"]
 
-    dataset_config = ToyDatasetConfig(**dataset_config)
-    dataset_dict = ToyDatasetDict(
+    dataset_config = DatasetConfig(**dataset_config)
+    dataset_dict = CustomDatasetDict(
         config=dataset_config,
         tokenizer=tokenizer,
         test_fold=0

@@ -14,7 +14,6 @@
 # limitations under the License.
 from typing import Optional
 
-from datasets import load_dataset
 from dataclasses import dataclass, field
 
 from transformers import HfArgumentParser, AutoModelForCausalLM, AutoTokenizer

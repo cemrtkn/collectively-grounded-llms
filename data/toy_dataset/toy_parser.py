@@ -2,7 +2,7 @@ import yaml
 from datasets import DatasetDict, concatenate_datasets
 from pydantic import BaseModel
 from typing import List
-from base_types import Conversation
+from data.toy_dataset.toy_base_types import Conversation
 
 class ToyParserConfig(BaseModel):
     fields: dict

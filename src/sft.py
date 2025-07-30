@@ -8,14 +8,12 @@ from transformers import Trainer
 import torch.distributed as dist
 from torch.profiler import profile
 
-from src.dataset import EventDatasetDict
 from src.sft_types import TrainingConfig
 from src.utils.setup_model import get_model
-from src.utils.config import load_config  # , set_output_dir
+from src.utils.config import load_config  
 from src.utils.dataset import load_dataset_and_collator
 from src.utils.value_util import EvaluateFirstStepCallback
 
-from src.utils.custom_eval_callback import logpEvalCallback
 import torch
 
 torch.cuda.empty_cache()
@@ -79,16 +77,6 @@ def run_sft(config: TrainingConfig):
     if config.train_args.resume_from_checkpoint is not None:
         checkpoint = config.train_args.resume_from_checkpoint
         print(f"Resuming from checkpoint: {checkpoint}")
-
-    if config.logging_group_for_custom_eval is not None and "test" in datasetdict:
-        logp_eval_callback = logpEvalCallback(
-            eval_dataset=datasetdict["test"],
-            tokenizer=tokenizer,
-            logging_group_for_custom_eval=config.logging_group_for_custom_eval,
-            saving_dir=saving_dir,
-            parser_config=config.train_dataset_config.parser_config,
-        )
-        trainer.add_callback(logp_eval_callback)
 
     if config.train_args.logging_first_step and "test" in datasetdict:
         trainer.add_callback(EvaluateFirstStepCallback())
